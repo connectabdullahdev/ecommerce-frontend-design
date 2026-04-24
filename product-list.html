@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List - Brand Marketplace</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* ===== GRID VIEW CARDS ===== */
+        .products-grid-view {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .grid-product-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+        /* HOVER EFFECT */
+        .grid-product-card:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transform: translateY(-4px);
+            border-color: var(--primary);
+        }
+        .grid-card-img {
+            height: 200px;
+            background: var(--bg-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 16px;
+            position: relative;
+        }
+        .grid-card-img img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+        .grid-product-card:hover .grid-card-img img {
+            transform: scale(1.06);
+        }
+        .grid-card-wishlist {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 32px;
+            height: 32px;
+            background: white;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            opacity: 0;
+            transition: var(--transition);
+            color: #ccc;
+        }
+        .grid-product-card:hover .grid-card-wishlist {
+            opacity: 1;
+        }
+        .grid-card-wishlist.wishlisted {
+            color: var(--red);
+            opacity: 1;
+        }
+        .grid-card-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--red);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+        .grid-card-body {
+            padding: 14px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .grid-card-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dark);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .grid-card-stars {
+            color: var(--yellow);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .grid-card-stars span { font-size: 12px; color: var(--text-light); }
+        .grid-card-price { font-size: 18px; font-weight: 700; color: var(--text-dark); }
+        .grid-card-old-price { font-size: 13px; color: var(--text-light); text-decoration: line-through; margin-left: 6px; }
+        .grid-card-free { font-size: 12px; color: var(--green); font-weight: 500; }
+
+        /* BUY NOW BUTTON */
+        .buy-now-btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            padding: 10px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            margin-top: auto;
+            font-family: inherit;
+        }
+        .buy-now-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.02);
+        }
+
+        /* LIST VIEW */
+        .products-list-view {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .list-buy-now {
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        .list-buy-now:hover { background: var(--primary-dark); }
+
+        /* LOAD MORE */
+        .load-more-section { text-align: center; padding: 10px 0 20px; }
+        .load-more-btn {
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 12px 48px;
+            border-radius: var(--radius);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        .load-more-btn:hover { background: var(--primary); color: white; }
+
+        /* Hidden extra products */
+        .extra-products { display: none; }
+        .extra-products.show-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .extra-products.show-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="topbar">
+    <div class="topbar-inner">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <path d="M16 10a4 4 0 01-8 0"/>
+                </svg>
+            </div>
+            Brand
+        </a>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search products, brands and categories">
+            <select class="search-select">
+                <option>All category</option>
+                <option>Electronics</option>
+                <option>Clothes</option>
+                <option>Accessories</option>
+                <option>Home & Outdoor</option>
+            </select>
+            <button class="search-btn">Search</button>
+        </div>
+        <div class="nav-icons">
+            <a href="#" class="nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Profile</span>
+            </a>
+            <a href="#" class="nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                <span>Message</span>
+            </a>
+            <a href="#" class="nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                <span>Orders</span>
+            </a>
+            <a href="#" class="nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+                <span class="cart-badge">3</span>
+                <span>My cart</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<nav class="navbar">
+    <div class="navbar-inner">
+        <a href="#" class="all-cat-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            All category
+        </a>
+        <div class="nav-links">
+            <a href="#" class="nav-link">Hot offers</a>
+            <a href="#" class="nav-link">Gift boxes</a>
+            <a href="#" class="nav-link">Projects</a>
+            <a href="#" class="nav-link">Menu item</a>
+            <a href="#" class="nav-link">Help ▾</a>
+        </div>
+        <div class="nav-right">
+            <span>English, USD ▾</span>
+            <span>🇩🇪 Ship to ▾</span>
+        </div>
+    </div>
+</nav>
+
+<!-- ============ MAIN ============ -->
+<main class="main">
+
+    <div class="breadcrumb">
+        <a href="index.html">Home</a> &gt; <a href="#">Electronics</a> &gt; <span class="current">All Products</span>
+    </div>
+
+    <div class="list-layout">
+
+        <!-- FILTERS SIDEBAR -->
+        <aside class="filters-sidebar">
+            <div class="filter-section">
+                <div class="filter-title">Category <span>∧</span></div>
+                <div class="filter-option"><input type="checkbox" id="c1" checked><label for="c1">Mobile accessory</label></div>
+                <div class="filter-option"><input type="checkbox" id="c2"><label for="c2">Electronics</label></div>
+                <div class="filter-option"><input type="checkbox" id="c3"><label for="c3">Smartphones</label></div>
+                <div class="filter-option"><input type="checkbox" id="c4"><label for="c4">Modern tech</label></div>
+                <a class="see-all">See all</a>
+            </div>
+            <div class="filter-section">
+                <div class="filter-title">Brands <span>∧</span></div>
+                <div class="filter-option"><input type="checkbox" id="b1" checked><label for="b1">Samsung</label></div>
+                <div class="filter-option"><input type="checkbox" id="b2" checked><label for="b2">Apple</label></div>
+                <div class="filter-option"><input type="checkbox" id="b3"><label for="b3">Huawei</label></div>
+                <div class="filter-option"><input type="checkbox" id="b4" checked><label for="b4">Poco</label></div>
+                <div class="filter-option"><input type="checkbox" id="b5"><label for="b5">Lenovo</label></div>
+                <a class="see-all">See all</a>
+            </div>
+            <div class="filter-section">
+                <div class="filter-title">Features <span>∧</span></div>
+                <div class="filter-option"><input type="checkbox" id="f1" checked><label for="f1">Metallic</label></div>
+                <div class="filter-option"><input type="checkbox" id="f2"><label for="f2">Plastic cover</label></div>
+                <div class="filter-option"><input type="checkbox" id="f3"><label for="f3">8GB Ram</label></div>
+                <div class="filter-option"><input type="checkbox" id="f4"><label for="f4">Super power</label></div>
+                <div class="filter-option"><input type="checkbox" id="f5"><label for="f5">Large Memory</label></div>
+                <a class="see-all">See all</a>
+            </div>
+            <div class="filter-section">
+                <div class="filter-title">Price range <span>∧</span></div>
+                <div class="price-range">
+                    <div class="price-input-wrap"><label>Min</label><input type="number" class="price-input" value="0"></div>
+                    <div class="price-input-wrap"><label>Max</label><input type="number" class="price-input" value="9999"></div>
+                </div>
+                <button class="apply-btn">Apply</button>
+            </div>
+            <div class="filter-section">
+                <div class="filter-title">Condition <span>∧</span></div>
+                <div class="filter-option"><input type="radio" name="cond" id="cd1" checked><label for="cd1">Any</label></div>
+                <div class="filter-option"><input type="radio" name="cond" id="cd2"><label for="cd2">Refurbished</label></div>
+                <div class="filter-option"><input type="radio" name="cond" id="cd3"><label for="cd3">Brand new</label></div>
+                <div class="filter-option"><input type="radio" name="cond" id="cd4"><label for="cd4">Old items</label></div>
+            </div>
+            <div class="filter-section">
+                <div class="filter-title">Ratings <span>∧</span></div>
+                <div class="filter-option"><input type="checkbox" id="r1"><label for="r1"><span class="rating-star">★★★★★</span> 5 star</label></div>
+                <div class="filter-option"><input type="checkbox" id="r2" checked><label for="r2"><span class="rating-star">★★★★</span>☆ 4 star</label></div>
+                <div class="filter-option"><input type="checkbox" id="r3" checked><label for="r3"><span class="rating-star">★★★</span>☆☆ 3 star</label></div>
+                <div class="filter-option"><input type="checkbox" id="r4"><label for="r4"><span class="rating-star">★★</span>☆☆☆ 2 star</label></div>
+            </div>
+        </aside>
+
+        <!-- PRODUCT MAIN AREA -->
+        <div class="product-list-main">
+
+            <!-- TOOLBAR -->
+            <div class="list-toolbar">
+                <div class="list-count">12,911 items in <strong>All Products</strong></div>
+                <label class="verified-check"><input type="checkbox" checked> Verified only</label>
+                <div class="sort-row">
+                    <span>Sort by:</span>
+                    <select class="sort-select">
+                        <option>Newest first</option>
+                        <option>Price: Low to High</option>
+                        <option>Price: High to Low</option>
+                        <option>Best Rated</option>
+                    </select>
+                </div>
+                <div class="view-toggles">
+                    <button class="view-btn active" id="gridViewBtn" title="Grid View">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    </button>
+                    <button class="view-btn" id="listViewBtn" title="List View">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ACTIVE FILTER TAGS -->
+            <div class="active-filters">
+                <div class="filter-tag">Samsung <span class="filter-tag-remove">✕</span></div>
+                <div class="filter-tag">Apple <span class="filter-tag-remove">✕</span></div>
+                <div class="filter-tag">Poco <span class="filter-tag-remove">✕</span></div>
+                <div class="filter-tag">Metallic <span class="filter-tag-remove">✕</span></div>
+                <div class="filter-tag">4 star <span class="filter-tag-remove">✕</span></div>
+                <span class="clear-all">Clear all filter</span>
+            </div>
+
+            <!-- ===== GRID VIEW (default on) ===== -->
+            <div class="products-grid-view" id="gridView">
+                <div class="grid-product-card">
+                    <div class="grid-card-img">
+                        <span class="grid-card-badge">-25%</span>
+                        <img src="https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=400&q=80" alt="Phone">
+                        <button class="grid-card-wishlist">♡</button>
+                    </div>
+                    <div class="grid-card-body">
+                        <div class="grid-card-name">Samsung Galaxy S23 Ultra 256GB Black</div>
+                        <div class="grid-card-stars">★★★★<span style="color:#ddd;">★</span> <span>(154 reviews)</span></div>
+                        <div><span class="grid-card-price">$998.00</span><span class="grid-card-old-price">$1,299.00</span></div>
+                        <div class="grid-card-free">✓ Free Shipping</div>
+                        <button class="buy-now-btn">Buy Now</button>
+                    </div>
+                </div>
+                <div class="grid-product-card">
+                    <div class="grid-card-img">
+                        <img src="https://images.unsplash.com/photo-1502982720700-bfff97f2ecac?w=400&q=80" alt="Camera">
+                        <button class="grid-card-wishlist">♡</button>
+                    </div>
+                    <div class="grid-card-body">
+                        <div class="grid-card-name">GoPro HERO6 4K Action Camera Black</div>
+                        <div class="grid-card-stars">★★★★<span style="color:#ddd;">★</span> <span>(89 reviews)</span></div>
+                        <div><span class="grid-card-price">$320.00</span></div>
+                        <div class="grid-card-free">✓ Free Shipping</div>
+                        <button class="buy-now-btn">Buy Now</button>
+                    </div>
+                </div>
+                <div class="grid-product-card">
+                    <div class="grid-card-img">
+                        <span class="grid-card-badge">-15%</span>
+                        <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&q=80" alt="Laptop">
+                        <button class="grid-card-wishlist">♡</button>
+                    </div>
+                    <div class="grid-card-body">
+                        <div class="grid-card-name">MacBook Pro 16" M2 Pro Space Gray</div>
+                        <div class="grid-card-stars">★★★★★ <span>(234 reviews)</span></div>
+                        <div><span class="grid-card-price">$2,499.00</span><span class="grid-card-old-price">$2,699.00</span></div>
+                        <div class="grid-card-free">✓ Free Shipping</div>
+                        <button class="buy-now-btn">Buy Now</button>
+                    </div>
+                </div>
+                <div class="grid-product-card">
+                    <div class="grid-card-img">
+                        <img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&q=80" alt="Watch">
+                        <button class="grid-card-wishlist">♡</button>
+                    </div>
+                    <div class="grid-card-body">
+                        <div class="grid-card-name">Apple Watch Series 8 GPS 45mm</div>
+                        <div class="grid-card-stars">★★★★<span style="color:#ddd;">★</span> <span>(542 reviews)</span></div>
+                        <div><span class="grid-card-price">$429.00</span><span class="grid-card-old-price">$499.00</span></div>
+                        <div class="grid-card-free">✓ Free Shipping</div>
+                        <button class="buy-now-btn">Buy Now</button>
+                    </div>
+                </div>
+                <div class="grid-product-card">
+                    <div class="grid-card-img">
+                        <span class="grid-card-badge">Sale</span>
+                        <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80" alt="Headphones">
+                        <button class="grid-card-wishlist">♡</button>
+                    </div>
+                    <div class="grid-card-body">
+                        <div class="grid-card-name">Sony WH-1000XM5 Wireless Noise Cancelling</div>
+                        <div class="grid-card-stars">★★★★★ <span>(1,254 reviews)</span></div>
+                        <div><span class="grid-card-price">$349.00</span></div>
+                        <div class="grid-card-free">✓ Free Shipping</div>
+                        <button class="buy-now-btn">Buy Now</button>
+                    </div>
+                </div>
+                <div class="grid-product-card">
+                    <div class="grid-card-img">
+                        <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=400&q=80" alt="Shirt">
+                        <button class="grid-card-wishlist">♡</button>
+                    </div>
+                    <div class="grid-card-body">
+                        <div class="grid-card-name">Men's Slim Fit Cotton T-Shirt Multi Color</div>
+                        <div class="grid-card-stars">★★★★<span style="color:#ddd;">★</span> <span>(312 reviews)</span></div>
+                        <div><span class="grid-card-price">$19.99</span></div>
+                        <div class="grid-card-free">✓ Free Shipping</div>
+                        <button class="buy-now-btn">Buy Now</button>
+                    </div>
+                </div>
+                <div class="grid-product-card">
+                    <div class="grid-card-img">
+                        <span class="grid-card-badge">-40%</span>
+                        <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&q=80" alt="Camera">
+                        <button class="grid-card-wishlist">♡</button>
+                    </div>
+                    <div class="grid-card-body">
+                        <div class="grid-card-name">Canon EOS 2000D DSLR Camera Kit 18-55mm</div>
+                        <div class="grid-card-stars">★★★★<span style="color:#ddd;">★</span> <span>(78 reviews)</span></div>
+                        <div><span class="grid-card-price">$599.00</span><span class="grid-card-old-price">$999.00</span></div>
+                        <div class="grid-card-free">✓ Free Shipping</div>
+                        <button class="buy-now-btn">Buy Now</button>
+                    </div>
+                </div>
+                <div class="grid-product-card">
+                    <div class="grid-card-img">
+                        <img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80" alt="Bag">
+                        <button class="grid-card-wishlist">♡</button>
+                    </div>
+                    <div class="grid-card-body">
+                        <div class="grid-card-name">Travel Backpack Waterproof Large 40L</div>
+                        <div class="grid-card-stars">★★★★★ <span>(445 reviews)</span></div>
+                        <div><span class="grid-card-price">$45.00</span></div>
+                        <div class="grid-card-free">✓ Free Shipping</div>
+                        <button class="buy-now-btn">Buy Now</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== LIST VIEW (hidden by default) ===== -->
+            <div class="products-list-view" id="listView" style="display:none;">
+                <a href="product-detail.html" class="product-list-item">
+                    <div class="list-item-img"><img src="https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=400&q=80" alt="Phone"></div>
+                    <div class="list-item-info">
+                        <h3>Samsung Galaxy S23 Ultra 256GB Black</h3>
+                        <div class="list-item-price">$998.00 <span class="list-item-old">$1,299.00</span></div>
+                        <div class="stars">★★★★<span style="color:#ddd;">★</span></div>
+                        <div class="review-info"><span>154 reviews</span><span class="free-ship">• Free Shipping</span></div>
+                        <p class="list-item-desc">High-performance smartphone with advanced camera system and premium build quality.</p>
+                    </div>
+                    <div class="list-item-actions">
+                        <button class="heart-btn">♡</button>
+                        <button class="list-buy-now">Buy Now</button>
+                        <span class="view-details-btn">View details</span>
+                    </div>
+                </a>
+                <a href="product-detail.html" class="product-list-item">
+                    <div class="list-item-img"><img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&q=80" alt="Laptop"></div>
+                    <div class="list-item-info">
+                        <h3>MacBook Pro 16" M2 Pro Space Gray</h3>
+                        <div class="list-item-price">$2,499.00 <span class="list-item-old">$2,699.00</span></div>
+                        <div class="stars">★★★★★</div>
+                        <div class="review-info"><span>234 reviews</span><span class="free-ship">• Free Shipping</span></div>
+                        <p class="list-item-desc">Next-level performance with M2 Pro chip. Stunning Liquid Retina XDR display for professionals.</p>
+                    </div>
+                    <div class="list-item-actions">
+                        <button class="heart-btn">♡</button>
+                        <button class="list-buy-now">Buy Now</button>
+                        <span class="view-details-btn">View details</span>
+                    </div>
+                </a>
+                <a href="product-detail.html" class="product-list-item">
+                    <div class="list-item-img"><img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&q=80" alt="Watch"></div>
+                    <div class="list-item-info">
+                        <h3>Apple Watch Series 8 GPS 45mm</h3>
+                        <div class="list-item-price">$429.00 <span class="list-item-old">$499.00</span></div>
+                        <div class="stars">★★★★<span style="color:#ddd;">★</span></div>
+                        <div class="review-info"><span>542 reviews</span><span class="free-ship">• Free Shipping</span></div>
+                        <p class="list-item-desc">Advanced health features with ECG. Always-on Retina display and 18-hour battery life.</p>
+                    </div>
+                    <div class="list-item-actions">
+                        <button class="heart-btn">♡</button>
+                        <button class="list-buy-now">Buy Now</button>
+                        <span class="view-details-btn">View details</span>
+                    </div>
+                </a>
+                <a href="product-detail.html" class="product-list-item">
+                    <div class="list-item-img"><img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80" alt="Headphones"></div>
+                    <div class="list-item-info">
+                        <h3>Sony WH-1000XM5 Wireless Headphones</h3>
+                        <div class="list-item-price">$349.00</div>
+                        <div class="stars">★★★★★</div>
+                        <div class="review-info"><span>1,254 reviews</span><span class="free-ship">• Free Shipping</span></div>
+                        <p class="list-item-desc">Industry-leading noise cancellation with 30-hour battery life and premium sound.</p>
+                    </div>
+                    <div class="list-item-actions">
+                        <button class="heart-btn">♡</button>
+                        <button class="list-buy-now">Buy Now</button>
+                        <span class="view-details-btn">View details</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- LOAD MORE EXTRA PRODUCTS -->
+            <div class="extra-products" id="extraProducts">
+                <div class="grid-product-card">
+                    <div class="grid-card-img">
+                        <img src="https://images.unsplash.com/photo-1627123424574-724758594e93?w=400&q=80" alt="Wallet">
+                        <button class="grid-card-wishlist">♡</button>
+                    </div>
+                    <div class="grid-card-body">
+                        <div class="grid-card-name">Genuine Leather Wallet Men Premium</div>
+                        <div class="grid-card-stars">★★★★<span style="color:#ddd;">★</span> <span>(98)</span></div>
+                        <div><span class="grid-card-price">$35.00</span></div>
+                        <div class="grid-card-free">✓ Free Shipping</div>
+                        <button class="buy-now-btn">Buy Now</button>
+                    </div>
+                </div>
+                <div class="grid-product-card">
+                    <div class="grid-card-img">
+                        <img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&q=80" alt="Jacket">
+                        <button class="grid-card-wishlist">♡</button>
+                    </div>
+                    <div class="grid-card-body">
+                        <div class="grid-card-name">Brown Winter Coat Medium Slim Fit</div>
+                        <div class="grid-card-stars">★★★★★ <span>(201)</span></div>
+                        <div><span class="grid-card-price">$89.00</span></div>
+                        <div class="grid-card-free">✓ Free Shipping</div>
+                        <button class="buy-now-btn">Buy Now</button>
+                    </div>
+                </div>
+                <div class="grid-product-card">
+                    <div class="grid-card-img">
+                        <span class="grid-card-badge">New</span>
+                        <img src="https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&q=80" alt="Jeans">
+                        <button class="grid-card-wishlist">♡</button>
+                    </div>
+                    <div class="grid-card-body">
+                        <div class="grid-card-name">Men's Slim Denim Jeans Blue Classic</div>
+                        <div class="grid-card-stars">★★★★<span style="color:#ddd;">★</span> <span>(156)</span></div>
+                        <div><span class="grid-card-price">$55.00</span></div>
+                        <div class="grid-card-free">✓ Free Shipping</div>
+                        <button class="buy-now-btn">Buy Now</button>
+                    </div>
+                </div>
+                <div class="grid-product-card">
+                    <div class="grid-card-img">
+                        <img src="https://images.unsplash.com/photo-1572119865084-43c285814d63?w=400&q=80" alt="Coffee">
+                        <button class="grid-card-wishlist">♡</button>
+                    </div>
+                    <div class="grid-card-body">
+                        <div class="grid-card-name">Premium Coffee Maker Machine Home</div>
+                        <div class="grid-card-stars">★★★★★ <span>(387)</span></div>
+                        <div><span class="grid-card-price">$129.00</span></div>
+                        <div class="grid-card-free">✓ Free Shipping</div>
+                        <button class="buy-now-btn">Buy Now</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LOAD MORE BUTTON -->
+            <div class="load-more-section">
+                <button class="load-more-btn" id="loadMoreBtn">Load more products</button>
+            </div>
+
+            <!-- PAGINATION -->
+            <div class="pagination">
+                <select class="page-show">
+                    <option>Show 10</option>
+                    <option>Show 20</option>
+                    <option>Show 50</option>
+                </select>
+                <button class="page-btn">‹</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">4</button>
+                <button class="page-btn">5</button>
+                <button class="page-btn">›</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- NEWSLETTER -->
+    <section class="newsletter" style="margin-top:30px;">
+        <h3>Subscribe on our newsletter</h3>
+        <p>Get daily news on upcoming offers from many suppliers all over the world</p>
+        <div class="newsletter-form">
+            <input type="email" placeholder="Email">
+            <button>Subscribe</button>
+        </div>
+    </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-inner">
+        <div class="footer-top">
+            <div>
+                <div class="footer-logo">
+                    <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></div>
+                    Brand
+                </div>
+                <p class="footer-desc">Best information about the company goes here but now lorem ipsum is.</p>
+                <div class="social-icons">
+                    <a href="#" class="social-icon"><svg viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg></a>
+                    <a href="#" class="social-icon"><svg viewBox="0 0 24 24"><path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 01-1.93.07 4.28 4.28 0 004 2.98 8.521 8.521 0 01-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/></svg></a>
+                    <a href="#" class="social-icon"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+                    <a href="#" class="social-icon"><svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+                </div>
+            </div>
+            <div class="footer-col"><h5>About</h5><a href="#">About Us</a><a href="#">Find store</a><a href="#">Categories</a><a href="#">Blogs</a></div>
+            <div class="footer-col"><h5>Partnership</h5><a href="#">About Us</a><a href="#">Find store</a><a href="#">Categories</a><a href="#">Blogs</a></div>
+            <div class="footer-col"><h5>Information</h5><a href="#">Help Center</a><a href="#">Money Refund</a><a href="#">Shipping</a><a href="#">Contact us</a></div>
+            <div class="footer-col"><h5>For users</h5><a href="#">Login</a><a href="#">Register</a><a href="#">Settings</a><a href="#">My Orders</a></div>
+            <div class="footer-col">
+                <h5>Get app</h5>
+                <a href="#" class="app-btn"><svg viewBox="0 0 24 24" fill="white"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg><div class="app-btn-text"><span>Download on the</span><span>App Store</span></div></a>
+                <a href="#" class="app-btn"><svg viewBox="0 0 24 24" fill="white"><path d="M3.609 1.814L13.792 12 3.609 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.61-.92zM14.91 13.12l2.528 1.459-10.29 5.944 7.762-7.403zM6.605 2.477l10.833 6.263-2.528 1.459L6.605 2.477zM19.294 10.05l2.906 1.678a1 1 0 010 1.733l-2.906 1.678-3.127-1.807 3.127-3.282z"/></svg><div class="app-btn-text"><span>Get it on</span><span>Google Play</span></div></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 Ecommerce.</span>
+            <span>🇺🇸 English</span>
+        </div>
+    </div>
+</footer>
+
+<script src="js/script.js"></script>
+<script>
+    // GRID / LIST TOGGLE
+    const gridViewBtn = document.getElementById('gridViewBtn');
+    const listViewBtn = document.getElementById('listViewBtn');
+    const gridView = document.getElementById('gridView');
+    const listView = document.getElementById('listView');
+    const extraProducts = document.getElementById('extraProducts');
+
+    gridViewBtn.addEventListener('click', function () {
+        gridViewBtn.classList.add('active');
+        listViewBtn.classList.remove('active');
+        gridView.style.display = 'grid';
+        listView.style.display = 'none';
+        if (extraProducts.classList.contains('show-list')) {
+            extraProducts.classList.replace('show-list', 'show-grid');
+        }
+    });
+
+    listViewBtn.addEventListener('click', function () {
+        listViewBtn.classList.add('active');
+        gridViewBtn.classList.remove('active');
+        gridView.style.display = 'none';
+        listView.style.display = 'flex';
+        if (extraProducts.classList.contains('show-grid')) {
+            extraProducts.classList.replace('show-grid', 'show-list');
+        }
+    });
+
+    // LOAD MORE
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    let loaded = false;
+    loadMoreBtn.addEventListener('click', function () {
+        if (!loaded) {
+            extraProducts.classList.add('show-grid');
+            loadMoreBtn.textContent = '✓ All products loaded';
+            loadMoreBtn.style.opacity = '0.5';
+            loadMoreBtn.style.cursor = 'default';
+            loaded = true;
+            // Re-attach buy now events to new cards
+            attachBuyNow();
+            attachWishlist();
+        }
+    });
+
+    // BUY NOW animation
+    function attachBuyNow() {
+        document.querySelectorAll('.buy-now-btn, .list-buy-now').forEach(btn => {
+            btn.onclick = function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const orig = this.textContent;
+                this.textContent = '✓ Added!';
+                this.style.background = '#00B517';
+                const badge = document.querySelector('.cart-badge');
+                if (badge) badge.textContent = parseInt(badge.textContent || 0) + 1;
+                setTimeout(() => {
+                    this.textContent = orig;
+                    this.style.background = '';
+                }, 1500);
+            };
+        });
+    }
+
+    // WISHLIST heart
+    function attachWishlist() {
+        document.querySelectorAll('.grid-card-wishlist, .heart-btn').forEach(btn => {
+            btn.onclick = function (e) {
+                e.stopPropagation();
+                this.classList.toggle('wishlisted');
+                this.textContent = this.classList.contains('wishlisted') ? '♥' : '♡';
+                this.style.color = this.classList.contains('wishlisted') ? '#FA3434' : '';
+            };
+        });
+    }
+
+    attachBuyNow();
+    attachWishlist();
+</script>
+</body>
+</html>

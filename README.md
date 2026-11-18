@@ -1,112 +1,68 @@
-# Ecommerce Frontend Design
+<div align="center">
 
-**DevelopersHub Corporation - Frontend Internship Task**
+# E-commerce Marketplace Frontend
 
-A responsive ecommerce marketplace website built with HTML5, CSS3, and JavaScript following the Figma design specifications.
+**A three-page B2B marketplace UI built from a Figma design with plain HTML, CSS and JavaScript.**
 
-## 📁 Project Structure
+[![Live demo](https://img.shields.io/badge/Live_demo-connectabdullahdev.github.io%2Fecommerce--frontend--design-0F3740?style=for-the-badge)](https://connectabdullahdev.github.io/ecommerce-frontend-design/)
+
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/Vanilla_JS-F7DF1E?logo=javascript&logoColor=black)
+
+<img src="docs/preview.jpg" alt="Marketplace home page with categories, hero banner and deals" width="900">
+
+</div>
+
+## About
+
+Project 1 of my front-end internship at **DevelopersHub Corporation**, built over three weeks from the [Ecommerce Web Design (Community)](https://www.figma.com/design/8Igr4IzlG1bE1ko7gOyNQP/Ecommerce-Web-Design-(Community)) Figma file.
+
+## Pages
+
+| Page | Highlights |
+| --- | --- |
+| [Home](https://connectabdullahdev.github.io/ecommerce-frontend-design/) | Category sidebar, hero banner, deals with a live countdown, home and electronics sections, inquiry form, recommended items, suppliers by region, newsletter |
+| [Product list](https://connectabdullahdev.github.io/ecommerce-frontend-design/product-list.html) | Filters for category, brand, features, price, condition and rating; removable filter tags; grid and list views; pagination |
+| [Product detail](https://connectabdullahdev.github.io/ecommerce-frontend-design/product-detail.html) | Image gallery with thumbnails, price tiers, size and colour options, supplier card, tabs for description, reviews, shipping and seller, related products |
+
+## Interactivity
+
+Written in vanilla JavaScript (`js/script.js`): search, category selection, filter tags, grid/list toggle, pagination, tabs, image gallery, size dropdown, add-to-cart animation, wishlist toggle, deals countdown timer, price tiers, inquiry form and newsletter signup.
+
+## Tech stack
+
+- **HTML5** with semantic structure
+- **CSS3** with Flexbox, Grid and animations, in one shared stylesheet
+- **Vanilla JavaScript** for all interactivity
+- Inter (Google Fonts), Unsplash images, FlagCDN flags
+
+The layout is desktop-first, as the task required, with responsive adjustments for tablets.
+
+## Run it locally
+
+```bash
+git clone https://github.com/connectabdullahdev/ecommerce-frontend-design.git
+cd ecommerce-frontend-design
+python -m http.server 8000   # then open http://localhost:8000
+```
+
+## Project structure
 
 ```
 ecommerce-frontend-design/
-│
-├── index.html              # Home page
-├── product-list.html       # Product listing page with filters
-├── product-detail.html     # Product detail page
-│
-├── css/
-│   └── style.css          # All styling (shared across pages)
-│
-├── js/
-│   └── script.js          # All JavaScript interactivity
-│
-└── images/                # Local image assets folder
+├── index.html            # home page
+├── product-list.html     # listing with filters
+├── product-detail.html   # product detail
+├── css/style.css         # shared styles
+├── js/script.js          # interactivity
+└── docs/                 # screenshots
 ```
 
-## ✅ Features Implemented
+---
 
-### Week 1: Header & Footer
-- [x] Responsive navigation bar with logo, search, and menu
-- [x] Footer with all links, social icons, and app buttons
-- [x] Accurate spacing and typography
+<div align="center">
 
-### Week 2: Home Page & Product Listing
-- [x] Hero section with banner
-- [x] Category sidebar
-- [x] Deals & offers with countdown timer
-- [x] Home and outdoor section
-- [x] Consumer electronics section
-- [x] Send inquiry banner
-- [x] Recommended items grid
-- [x] Extra services cards
-- [x] Suppliers by region
-- [x] Newsletter subscription
-- [x] Product listing with grid layout
-- [x] Filters sidebar (Category, Brand, Features, Price, Condition, Ratings)
-- [x] Active filter tags
-- [x] Pagination
+Built by **Muhammad Abdullah** during the DevelopersHub Corporation front-end internship · [LinkedIn](https://www.linkedin.com/in/connectabdullahdev) · [GitHub](https://github.com/connectabdullahdev)
 
-### Week 3: Product Details & Interactivity
-- [x] Product images with thumbnails gallery
-- [x] Price tiers selection
-- [x] Product specifications
-- [x] Size and color dropdowns
-- [x] Supplier card
-- [x] Tabs (Description, Reviews, Shipping, About seller)
-- [x] You may like section
-- [x] Related products
-- [x] JavaScript search bar (styled)
-- [x] Add to cart animation
-- [x] Wishlist heart button
-- [x] Tab switching
-- [x] Image gallery thumbnails
-- [x] Filter tag removal
-- [x] Pagination
-
-## 🛠️ Technologies Used
-
-- **HTML5** - Semantic structure
-- **CSS3** - Flexbox, Grid, animations
-- **JavaScript (Vanilla)** - DOM manipulation, interactivity
-- **Google Fonts (Inter)** - Typography
-- **Unsplash** - Product images
-- **FlagCDN** - Country flags
-
-## 🚀 How to Run
-
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/ecommerce-frontend-design.git
-```
-
-2. Open `index.html` in your browser, or use a local server:
-```bash
-cd ecommerce-frontend-design
-python -m http.server 8000
-# Then open http://localhost:8000
-```
-
-## 📱 Pages
-
-1. **index.html** - Home page with hero, categories, products
-2. **product-list.html** - Browse products with filters
-3. **product-detail.html** - Single product view with details
-
-## 🎨 Design Reference
-
-Based on the Figma design:
-https://www.figma.com/design/8Igr4IzlG1bE1ko7gOyNQP/Ecommerce-Web-Design-(Community)
-
-## 📝 Notes
-
-- All pages are desktop-focused as per task requirements
-- Basic responsive design included for tablets
-- JavaScript interactivity includes: search, tabs, filters, gallery, cart
-- Semantic HTML5 used throughout for accessibility
-
-## 👨‍💻 Author
-
-Internship Task for DevelopersHub Corporation
-
-## 📄 License
-
-MIT
+</div>
